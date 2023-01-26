@@ -1,32 +1,33 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class BirdMover : MonoBehaviour
 {
-    [SerializeField] private Camera _camera;
+    [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpForce;
-    [SerializeField] private float _maxAngle;
-    [SerializeField] private float _mixAngle;
-    [SerializeField] private float _rotationSpeed;
 
-    public UnityAction WingClap;
-
-    private Vector3 _starPosition;
-    private Rigidbody2D _rigidbody;
     private PlayerInput _playerInput;
-    private float _maxHeight;
-
+    private Rigidbody2D _rigidbody;
 
     private void Awake()
     {
-        _playerInput = new PlayerInput();
-        _playerInput.Bird.Jump.performed += ctx => Jump();
+        _playerInput = new PlayerInput();   
     }
 
     private void OnEnable()
     {
         _playerInput.Enable();
+    }
+    
+    private void Start()
+    {
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _playerInput.Bird.Jump.performed += ctx => Jump();
+    }
+
+    private void FixedUpdate()
+    {
+        _rigidbody.velocity = new Vector2(_moveSpeed, _rigidbody.velocity.y);    
     }
 
     private void OnDisable()
@@ -34,34 +35,9 @@ public class BirdMover : MonoBehaviour
         _playerInput.Disable();
     }
 
-    private void Start()
-    {
-        _rigidbody = GetComponent<Rigidbody2D>();
-        _maxHeight = _camera.ViewportToWorldPoint(new Vector2(0, 1)).y;
-        _starPosition = transform.position;
-    }
-
-    private void Update()
-    {
-        Rotate();
-    }
-
     private void Jump()
     {
-        if (transform.position.y < _maxHeight)
-        {
-            _rigidbody.velocity = Vector2.zero;
-            _rigidbody.AddForce(Vector2.up * _jumpForce);
-        }
-
-        WingClap?.Invoke();
-
-        transform.localEulerAngles = new Vector3(0, 0, _maxAngle);
-    }
-
-    private void Rotate()
-    {
-        float rotation = Mathf.MoveTowardsAngle(transform.localEulerAngles.z, _mixAngle, _rotationSpeed);
-        transform.localEulerAngles = new Vector3(0, 0, rotation);
+        _rigidbody.velocity = new Vector2(_moveSpeed, 0);
+        _rigidbody.AddForce(Vector2.up * _jumpForce);
     }
 }
