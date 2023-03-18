@@ -5,14 +5,19 @@ public class PipeGenerator : MonoBehaviour
 {
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private float _spawnRate;
+    [SerializeField] private float _offsetY;
 
     private PipePool _pipePool;
-    private Vector2 _disablePoint => Camera.main.ViewportToWorldPoint(new Vector2(0, 0.5f));
     private float _elapsedTime = 0;
 
-    private void Start()
+    private void Awake()
     {
         _pipePool = GetComponent<PipePool>();
+    }
+
+    private void OnEnable()
+    {
+        _elapsedTime = _spawnRate;
     }
 
     private void Update()
@@ -21,11 +26,14 @@ public class PipeGenerator : MonoBehaviour
 
         if(_elapsedTime > _spawnRate)
         {
+            Vector2 spawnPosition = new Vector2(_spawnPoint.position.x, Random.Range(-_offsetY, _offsetY));
+            _pipePool.SpawnObject(spawnPosition);
+            _elapsedTime = 0;
         }
     }
 
-    private void SpawnPipe()
+    public void Restart()
     {
-
+        _pipePool.Restart();
     }
 }

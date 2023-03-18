@@ -8,11 +8,19 @@ public abstract class ObjectPool : MonoBehaviour
 
     protected List<GameObject> Objects = new List<GameObject>();
 
-    private void Initialize(GameObject gameObject)
+    public void Restart()
+    {
+        foreach (var item in Objects)
+        {
+            item.SetActive(false);
+        }
+    }
+
+    protected void Initialize(GameObject gameObject,Transform container)
     {
         for (int i = 0; i < Capacity; i++)
         {
-            GameObject created = Instantiate(gameObject, transform);
+            GameObject created = Instantiate(gameObject, container);
             created.SetActive(false);
             Objects.Add(created);
         }
@@ -31,20 +39,11 @@ public abstract class ObjectPool : MonoBehaviour
 
         foreach (var item in Objects)
         {
-            if(item.activeSelf == true)
+            if (item.activeSelf == true)
             {
                 if (item.transform.position.x < disablePoint.x)
                     item.SetActive(false);
             }
         }
     }
-
-    protected void ResetPool()
-    {
-        foreach (var item in Objects)
-        {
-            item.SetActive(false);
-        }
-    }
-
 }
